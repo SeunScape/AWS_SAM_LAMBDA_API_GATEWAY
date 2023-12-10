@@ -1,0 +1,41 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  aws-resume-backend
+
+  Sample SAM Template for aws-resume-backend
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+  Api:
+    Cors:
+      AllowMethods: "'GET,POST,OPTIONS'"
+      AllowHeaders: "'content-type'"
+      AllowOrigin: "'*'"
+
+Resources:
+  CounterFunction:
+    Type: AWS::Serverless::Function # Signifies this will create a Lambda; More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: counter/
+      Handler: app.lambda_handler
+      Runtime: python3.11
+      Policies: 
+        - DynamoDBCrudPolicy:
+            TableName: 
+              !Ref CounterTable
+      Architectures:
+        - x86_64
+      Events:
+        IncrementCounter:
+          Type: Api # Signifies this will create an API Gateway;  More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /counter
+            Method: get
+  CounterTable: 
+    Type: AWS::Serverless::SimpleTable
+    Properties: 
+      TableName: counterDatabase
