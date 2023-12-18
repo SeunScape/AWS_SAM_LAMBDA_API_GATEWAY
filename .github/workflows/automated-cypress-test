@@ -26,4 +26,10 @@ jobs:
       - name: Run Python tests
         run: |
           pytest
-
+          
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::561511046884:role/my-github-actions-role
+          role-session-name: test-session
