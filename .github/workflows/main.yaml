@@ -12,7 +12,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
+         permissions:
+          id-token: write
+          contents: read
+          
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
@@ -33,7 +36,7 @@ jobs:
           aws-region: us-east-1
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCESS_KEY_ID }}:role/${{ secrets.AWS_SECRET_ACCESS_KEY }}
           role-session-name: myGitHubActions
-          
+
       - name: Set up AWS SAM
         uses: aws-actions/setup-sam@v1
 
