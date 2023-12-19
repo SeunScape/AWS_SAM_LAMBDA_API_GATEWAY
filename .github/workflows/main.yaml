@@ -1,60 +1,28 @@
-name: Run build, tests, and deployment on push
+name: Deploy to AWS
 
 on:
   push:
     branches:
-      - main
-env:
-  AWS_DEFAULT_REGION: us-east-1
-  AWS_DEFAULT_OUTPUT: json
-
-permissions:
-  id-token: write
-  contents: read
+      - main  # Replace with your main branch name
 
 jobs:
-  build-deploy:
+  deploy:
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v3
+      - name: Assume AWS deploy role
+        id: assume_aws_role
+        uses: aws-actions/configure-aws-credentials@v1
         with:
-          python-version: 3.11
+          role-to-assume: arn:aws:iam::561511046884:role/GithubActionsRole
+          aws-region: us-east-1  # Replace with your AWS region
 
-      - name: Install dependencies
+      - name: Deploy to AWS
         run: |
-          python -m pip install -r .github/workflows/requirements.txt
-
-      - name: Display Python version
-        run: python -c "import sys; print(sys.version)"
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-region: us-east-1
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.AWS_DEPLOY_ROLE }}
-          role-session-name: myGitHubActions
-
-      - name: Set up AWS SAM
-        uses: aws-actions/setup-sam@v1
-
-      - name: Build SAM application
-        run: sam build --use-container
-
-      - name: Test with pytest
-        run: pytest
-
-      - name: Deploy SAM application
-        run: |
-          sam deploy \
-            --debug \
-            --no-confirm-changeset \
-            --no-fail-on-empty-changeset \
-            --stack-name aws-resume-stack \
-            --s3-bucket ${{ secrets.S3_FOR_SAM }} \
-            --capabilities CAPABILITY_IAM \
-            --region us-east-1
+          # Your deployment commands using assumed role credentials
+          aws s3 sync ./path/to/deploy s3://your-bucket-name
+          aws lambda update-function-code --function-name your-function-name --zip-file fileb://lambda.zip
+          # Other deployment commands as needed
