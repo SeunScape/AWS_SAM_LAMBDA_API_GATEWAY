@@ -1,45 +1,60 @@
-name: Python AWS CI/CD
+name: Run build, tests, and deployment on push
 
 on:
   push:
     branches:
-      - main  # Replace with your main branch name
+      - main
+env:
+  AWS_DEFAULT_REGION: us-east-1
+  AWS_DEFAULT_OUTPUT: json
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
-  build:
+  build-deploy:
     runs-on: ubuntu-latest
-    
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_DEFAULT_REGION: us-east-1
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
-          python-version: '3.11'  
+          python-version: 3.11
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt  # Replace with your requirements file name
+          python -m pip install -r .github/workflows/requirements.txt
 
-      - name: Run Python tests
-        run: |
-          pytest  
+      - name: Display Python version
+        run: python -c "import sys; print(sys.version)"
 
-      - name: Install Cypress
-        run: |
-          npm install cypress --save-dev
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.AWS_DEPLOY_ROLE }}
+          role-session-name: myGitHubActions
 
-      - name: Run Cypress tests
-        run: |
-          npx cypress run  # Adjust this command as per your Cypress setup
+      - name: Set up AWS SAM
+        uses: aws-actions/setup-sam@v1
 
-      - name: Deploy to AWS
+      - name: Build SAM application
+        run: sam build --use-container
+
+      - name: Test with pytest
+        run: pytest
+
+      - name: Deploy SAM application
         run: |
-          # Use AWS CLI or SDK to deploy to AWS using the provided credentials
+          sam deploy \
+            --debug \
+            --no-confirm-changeset \
+            --no-fail-on-empty-changeset \
+            --stack-name aws-resume-stack \
+            --s3-bucket ${{ secrets.S3_FOR_SAM }} \
+            --capabilities CAPABILITY_IAM \
+            --region us-east-1
