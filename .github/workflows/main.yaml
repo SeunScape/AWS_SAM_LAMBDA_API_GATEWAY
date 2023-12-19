@@ -1,56 +1,47 @@
-name: Run build, tests, and deployment on push
+name: Run build, tests, and deployment on push 
 
 on:
   push:
     branches:
-      - main
-env:
-  AWS_DEFAULT_REGION: us-east-1
-  AWS_DEFAULT_OUTPUT: json
+    - main
 
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v2
+      - uses: aws-actions/setup-sam@v1
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - run: sam build --use-container
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
         with:
           python-version: 3.11
-
-      - name: Install dependencies
-        run: |
-          python -m pip install -r .github/workflows/requirements.txt
-
       - name: Display Python version
         run: python -c "import sys; print(sys.version)"
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          aws-region: us-east-1
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.AWS_DEPLOY_ROLE }}
-          role-session-name: myGitHubActions
-
-      - name: Set up AWS SAM
-        uses: aws-actions/setup-sam@v1
-
-      - name: Build SAM application
-        run: sam build --use-container
-
-      - name: Test with pytest
-        run: pytest
-
-      - name: Deploy SAM application
+          python-version: '3.x'
+      - name: Install dependencies
         run: |
-          sam deploy \
-            --debug \
-            --no-confirm-changeset \
-            --no-fail-on-empty-changeset \
-            --stack-name aws-resume-stack \
-            --s3-bucket ${{ secrets.S3_FOR_SAM }} \
-            --capabilities CAPABILITY_IAM \
-            --region us-east-1
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Test with pytest
+        run: |
+          pytest    
+
+      - run: sam deploy --debug --no-confirm-changeset --no-fail-on-empty-changeset --stack-name aws-resume-stack --s3-bucket ${{ secrets.S3_FOR_SAM }} --capabilities CAPABILITY_IAM --region us-east-1
