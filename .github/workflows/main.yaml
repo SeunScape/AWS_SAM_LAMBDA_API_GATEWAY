@@ -6,7 +6,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
       - uses: actions/setup-python@v3
       - uses: aws-actions/setup-sam@v2
       - uses: aws-actions/configure-aws-credentials@v1
@@ -16,9 +16,9 @@ jobs:
           aws-region: us-east-2
       - run: sam build --use-container
       - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
-
-      - name: Cypress tests
-        uses: ./
+      
+      - name: Cypress run
+        uses: cypress-io/github-action@v3
         with:
-          working-directory: cypress-test/basic
-          build: npx cypress info
+          build: npm run build
+          start: npm start
