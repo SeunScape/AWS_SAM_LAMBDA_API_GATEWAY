@@ -16,5 +16,9 @@
   "bugs": {
     "url": "https://github.com/SeunScape/AWS_SAM_LAMBDA_API_GATEWAY/issues"
   },
-  "homepage": "https://github.com/SeunScape/AWS_SAM_LAMBDA_API_GATEWAY#readme"
+  "homepage": "https://github.com/SeunScape/AWS_SAM_LAMBDA_API_GATEWAY#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "sass": "^1.69.5"
+  }
 }
