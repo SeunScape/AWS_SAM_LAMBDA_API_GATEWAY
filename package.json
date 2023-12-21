@@ -1,0 +1,23 @@
+{
+  "name": "interface",
+  "version": "1.0.0",
+  "description": "This project contains source code and supporting files for a serverless application that you can deploy with the SAM CLI. It includes the following files and folders.",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SeunScape/AWS_SAM_LAMBDA_API_GATEWAY.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SeunScape/AWS_SAM_LAMBDA_API_GATEWAY/issues"
+  },
+  "homepage": "https://github.com/SeunScape/AWS_SAM_LAMBDA_API_GATEWAY#readme"
+}
