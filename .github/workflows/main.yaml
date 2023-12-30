@@ -17,7 +17,7 @@ jobs:
       - run: sam build --use-container
       - name: Run Cypress tests
         run: |
-          cd Interface/cypress_tests/cypress/e2e/lambdaApiGateway.cy.js
+          cd  cypress_tests/cypress/e2e/lambdaApiGateway.cy.js
           npm install cypress --save-dev
           npx cypress open
           npx cypress run
