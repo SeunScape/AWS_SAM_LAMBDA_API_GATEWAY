@@ -2,6 +2,7 @@ on:
   push:
     branches:
       - main
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -15,9 +16,11 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
       - run: sam build --use-container
-      - name: Cypress run
-        uses: cypress-io/github-action@v6
-        with:
-          build: npm run build
-          start: npm start
+
+      - name: Run Cypress tests
+        working-directory: cypress_tests/cypress/e2e/
+        run: |
+          npm install cypress --save-dev
+          npx cypress run
+
       - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
