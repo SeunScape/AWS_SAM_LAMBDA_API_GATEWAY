@@ -20,6 +20,5 @@ jobs:
       - name: Run Cypress tests
         run: |
           npm install cypress --save-dev
-          npx cypress open
           npx cypress run --spec "cypress/e2e/lambdaApiGateway.cy.js"
       - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset

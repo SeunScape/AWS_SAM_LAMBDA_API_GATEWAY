@@ -3,7 +3,7 @@
 
 ### Linux ###
 *~
-
+node_modules
 # temporary files which can be created if a process still has a handle open of a deleted file
 .fuse_hidden*
 
@@ -240,5 +240,4 @@ $RECYCLE.BIN/
 # Build folder
 
 */build/*
-node_modules/
 # End of https://www.gitignore.io/api/osx,linux,python,windows,pycharm,visualstudiocode
