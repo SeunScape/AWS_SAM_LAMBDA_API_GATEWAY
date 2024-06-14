@@ -1,4 +1,4 @@
-Visitor Counter for Portfolio Website
+# Visitor Counter for Portfolio Website
 
 This repository contains the code for a serverless visitor counter implemented on my portfolio website. The visitor counter functionality is provided through an API Gateway, with data stored in DynamoDB and Lambda functions triggered to call the API. The project includes CI/CD pipelines managed via GitHub Actions and end-to-end tests conducted using Cypress.
 
